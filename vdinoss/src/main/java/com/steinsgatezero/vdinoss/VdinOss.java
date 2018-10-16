@@ -19,10 +19,8 @@ import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -251,14 +249,6 @@ public final class VdinOss {
             stringBuilder.append(stringBuilder2.substring(lastIndex, stringBuilder2.length()));
         }
         return stringBuilder.toString();
-    }
-
-    private void getForecastFileUrl() {
-        List<String> list = new ArrayList<>();
-        for (String objectName : taskHashMap.keySet()) {
-
-        }
-
     }
 
     /**
