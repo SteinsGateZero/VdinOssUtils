@@ -125,7 +125,7 @@ public final class VdinOss {
         configuration.setMaxErrorRetry(builder.maxErrorRetry);
         configuration.setSocketTimeout(builder.socketTimeout);
         taskHashMap = new HashMap<>();
-        oss = new OSSClient(context, endPoint, credentialProvider, configuration);
+        oss = new OSSClient(context.getApplicationContext(), endPoint, credentialProvider, configuration);
     }
 
     /**
