@@ -2,6 +2,7 @@ package com.steinsgatezero.vdinoss;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.alibaba.sdk.android.oss.ClientConfiguration;
 import com.alibaba.sdk.android.oss.ClientException;
@@ -12,6 +13,7 @@ import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
 import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
+import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
@@ -41,6 +43,7 @@ public final class VdinOss {
     public static final int ERR_SERVICE = 2;//服务异常
     private OssCompleteCallback completeCallback;
     private OssProgressCallback progressCallback;
+    private String securityToken;
 
     public static final class Builder {
         private final Context context;
@@ -55,6 +58,7 @@ public final class VdinOss {
         private int maxErrorRetry = 2;//失败后重试次数
         private final OssCompleteCallback completeCallback;
         private OssProgressCallback progressCallback;
+        private String securityToken;
 
         public Builder(@NotNull Context context, @NotNull String accessKeyId, @NotNull String accessKeySecret, @NotNull String endPoint, @NotNull String bucketName, @NotNull OssCompleteCallback completeCallback) {
             this.accessKeyId = accessKeyId;
@@ -63,6 +67,11 @@ public final class VdinOss {
             this.bucketName = bucketName;
             this.context = context;
             this.completeCallback = completeCallback;
+        }
+
+        public Builder(@NotNull Context context, @NotNull String accessKeyId, @NotNull String accessKeySecret, @NotNull String securityToken, @NotNull String endPoint, @NotNull String bucketName, @NotNull OssCompleteCallback completeCallback) {
+            this(context, accessKeyId, accessKeySecret, endPoint, bucketName, completeCallback);
+            this.securityToken = securityToken;
         }
 
         public Builder(@NotNull Context context, @NotNull OssCompleteCallback completeCallback) {
@@ -118,7 +127,12 @@ public final class VdinOss {
         this.isAsync = builder.isAsync;
         this.completeCallback = builder.completeCallback;
         this.progressCallback = builder.progressCallback;
-        credentialProvider = new OSSPlainTextAKSKCredentialProvider(accessKeyId, accessKeySecret);
+        if (TextUtils.isEmpty(builder.securityToken)) {
+            credentialProvider = new OSSPlainTextAKSKCredentialProvider(accessKeyId, accessKeySecret);
+        } else {
+            this.securityToken = builder.securityToken;
+            credentialProvider = new OSSStsTokenCredentialProvider(accessKeyId, accessKeySecret, securityToken);
+        }
         configuration = new ClientConfiguration();
         configuration.setConnectionTimeout(builder.connectionTimeout);
         configuration.setMaxConcurrentRequest(builder.maxConcurrentRequest);
